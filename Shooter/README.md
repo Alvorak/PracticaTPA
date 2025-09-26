@@ -1,4 +1,4 @@
-# Game1
+# Prototipo de Shooter
 
 ## Requisitos
 
