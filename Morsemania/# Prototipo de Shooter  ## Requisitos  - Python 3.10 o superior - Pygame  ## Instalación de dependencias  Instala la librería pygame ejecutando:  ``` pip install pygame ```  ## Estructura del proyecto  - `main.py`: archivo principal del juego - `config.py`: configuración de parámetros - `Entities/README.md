@@ -1,4 +1,4 @@
-# Prototipo de Shooter
+# Prototipo de Morsemania
 
 ## Requisitos
 
@@ -17,7 +17,6 @@ pip install pygame
 
 - `main.py`: archivo principal del juego
 - `config.py`: configuración de parámetros
-- `Entities/`: contiene las clases principales (`Player`, `Projectile`, `Target`)
 
 ## Ejecución
 
