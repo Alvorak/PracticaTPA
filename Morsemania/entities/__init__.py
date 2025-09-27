@@ -1,0 +1,1 @@
+# Entities package for Morsemania

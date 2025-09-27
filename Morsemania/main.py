@@ -16,10 +16,12 @@ def draw_menu(screen, FONT):
 	screen.blit(subtitle, (50, 120))
 	option1 = FONT.render('1. Modo entrenamiento', True, GREEN)
 	screen.blit(option1, (50, 180))
-	option2 = FONT.render('2. Salir', True, GREEN)
+	option2 = FONT.render('2. Hundir la Flota', True, GREEN)
 	screen.blit(option2, (50, 240))
+	option3 = FONT.render('3. Salir', True, GREEN)
+	screen.blit(option3, (50, 300))
 	info = FONT.render('Pulsa el número y Enter para elegir', True, GREEN)
-	screen.blit(info, (50, 300))
+	screen.blit(info, (50, 360))
 	pygame.display.flip()
 
 def modo_entrenamiento(screen, FONT):
@@ -96,6 +98,7 @@ def main():
 	menu_active = True
 	selected = ''
 	esc_pressed_time = None
+	from entities.hundirflota import HundirLaFlota
 	while menu_active:
 		draw_menu(screen, FONT)
 		esc_pressed_time = check_esc_close(screen, FONT, esc_pressed_time)
@@ -109,11 +112,16 @@ def main():
 					selected = '1'
 				elif event.unicode == '2':
 					selected = '2'
+				elif event.unicode == '3':
+					selected = '3'
 				elif event.key == pygame.K_RETURN:
 					if selected == '1':
 						ModoEntrenamiento(screen, FONT).run()
 						selected = ''
 					elif selected == '2':
+						HundirLaFlota(screen, FONT).run()
+						selected = ''
+					elif selected == '3':
 						pygame.quit()
 						sys.exit()
 		pygame.time.Clock().tick(30)
