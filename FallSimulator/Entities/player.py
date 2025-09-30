@@ -1,5 +1,6 @@
 import pygame
 import config
+from constants import *
 
 # Clase que representa al jugador
 class Player:

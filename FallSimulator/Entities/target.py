@@ -1,6 +1,7 @@
 import pygame
 import random
 import config
+from constants import *
 
 # Clase que representa el objetivo a golpear
 class Target:

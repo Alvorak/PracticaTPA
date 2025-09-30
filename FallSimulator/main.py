@@ -3,7 +3,7 @@ import pygame
 import sys
 import random
 import config
-from config import *
+from constants import *
 from Entities.player import Player
 from Entities.projectile import Projectile
 from Entities.target import Target
@@ -22,7 +22,7 @@ def main():
         config.SCREEN_WIDTH = screen_w
         config.SCREEN_HEIGHT = screen_h
         screen = pygame.display.set_mode((screen_w, screen_h))
-    pygame.display.set_caption(config.GameTitle) # Título del Juego
+        pygame.display.set_caption(GameTitle) # Título del Juego
     clock = pygame.time.Clock()
     font = pygame.font.SysFont("Arial Unicode MS", 20)
 
