@@ -74,19 +74,20 @@ class Player:
         if self.rect.left < 0:
             self.rect.left = 0
             self.vx = 0
-        if self.rect.right > config.SCREEN_WIDTH:
-            self.rect.right = config.SCREEN_WIDTH
+        if self.rect.right > config.VIEWPORT_WIDTH:
+            self.rect.right = config.VIEWPORT_WIDTH
             self.vx = 0
-        ground_y = config.SCREEN_HEIGHT - config.GROUND_HEIGHT
+        # El suelo está en la base del área jugable (viewport)
+        ground_y = config.VIEWPORT_HEIGHT - config.GROUND_HEIGHT
         if self.rect.bottom >= ground_y:
             self.rect.bottom = ground_y
             self.vy = 0.0
             self.on_ground = True
 
-    def draw(self, surface):
+    def draw(self, surface): # Dibuja el jugador en pantalla
         pygame.draw.rect(surface, self.color, self.rect)
         head_w = 10
         cx = self.rect.centerx + (self.facing * (self.rect.width // 2 + 1))
         cy_top = self.rect.top + 18
         points = [(cx, cy_top), (cx + (-self.facing)*head_w, cy_top+7), (cx + (-self.facing)*head_w, cy_top-7)]
-        pygame.draw.polygon(surface, (200,200,200), points)
+        pygame.draw.polygon(surface, (200,200,200), points) # Dibuja un triangulo como orientacion de los ojos del jugador

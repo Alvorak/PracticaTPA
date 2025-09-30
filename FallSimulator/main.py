@@ -10,25 +10,46 @@ from Entities.target import Target
 # Función principal - El Game Loop del juego
 def main():
     pygame.init()
-    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-    pygame.display.set_caption("Fall Simulator")
+    #Obtener resolución de pantalla si FULLSCREEN 
+    if config.FULLSCREEN: #Si es pantalla completa, obtener resolución actual
+        display_info = pygame.display.Info()
+        screen_w, screen_h = display_info.current_w, display_info.current_h
+        config.SCREEN_WIDTH = screen_w
+        config.SCREEN_HEIGHT = screen_h
+        screen = pygame.display.set_mode((screen_w, screen_h), pygame.FULLSCREEN)
+    else:# Modo ventana
+        screen_w, screen_h = config.VIEWPORT_WIDTH, config.VIEWPORT_HEIGHT
+        config.SCREEN_WIDTH = screen_w
+        config.SCREEN_HEIGHT = screen_h
+        screen = pygame.display.set_mode((screen_w, screen_h))
+    pygame.display.set_caption(config.GameTitle) # Título del Juego
     clock = pygame.time.Clock()
     font = pygame.font.SysFont("Arial Unicode MS", 20)
 
-    player = Player(SCREEN_WIDTH // 3, SCREEN_HEIGHT - GROUND_HEIGHT - 90)
+    #Crear superficie del viewport jugable
+    #Ajustar viewport para que ocupe todo el alto de la pantalla
+    viewport_w = config.VIEWPORT_WIDTH
+    viewport_h = screen_h  # Ocupa todo el alto de la pantalla
+    config.VIEWPORT_HEIGHT = viewport_h  # Actualiza el valor global
+    viewport = pygame.Surface((viewport_w, viewport_h))
+    # Coordenadas para centrar el viewport horizontalmente
+    viewport_x = (screen_w - viewport_w) // 2
+    viewport_y = 0
+
+    #Inicializar entidades usando el viewport (Utilizar config para límites)
+    player = Player(viewport_w // 3, viewport_h - config.GROUND_HEIGHT - 90)
     projectiles = []
     target = Target()
 
-    running = True
+    running = True # Para controlar el bucle principal del juego, false para salir
     # Llevar registro de qué flechas están presionadas
     arrow_keys = {pygame.K_UP: False, pygame.K_DOWN: False, pygame.K_LEFT: False, pygame.K_RIGHT: False}
     shoot_timer = 0.0
     shoot_interval = 0.15  # segundos entre disparos
     while running:
-        dt = clock.tick(FPS) / 1000.0
-
+        dt = clock.tick(config.FPS) / 1000.0 
         keys = pygame.key.get_pressed()
-    # Determinar dirección de disparo según flechas (puede ser diagonal)
+        # Determinar dirección de disparo según flechas (puede ser diagonal)
         shoot_x = (1 if arrow_keys[pygame.K_RIGHT] else 0) + (-1 if arrow_keys[pygame.K_LEFT] else 0)
         shoot_y = (1 if arrow_keys[pygame.K_DOWN] else 0) + (-1 if arrow_keys[pygame.K_UP] else 0)
         shoot_dir = (shoot_x, shoot_y) if shoot_x or shoot_y else None
@@ -49,7 +70,7 @@ def main():
                 if event.key in arrow_keys:
                     arrow_keys[event.key] = False
 
-    # Disparar continuamente mientras se mantenga alguna flecha
+        # Disparar continuamente mientras se mantenga alguna flecha
         if shoot_dir:
             shoot_timer += dt
             while shoot_timer >= shoot_interval:
@@ -65,8 +86,9 @@ def main():
                 def custom_update(self, dt):
                     self.rect.x += int(self.vx * dt)
                     self.rect.y += int(self.vy * dt)
-                    if (self.rect.right < 0 or self.rect.left > SCREEN_WIDTH or
-                        self.rect.bottom < 0 or self.rect.top > SCREEN_HEIGHT):
+                    # Limitar proyectil al área jugable (viewport)
+                    if (self.rect.right < 0 or self.rect.left > viewport_w or
+                        self.rect.bottom < 0 or self.rect.top > viewport_h):
                         self.active = False
                 proj.update = custom_update.__get__(proj)
                 projectiles.append(proj)
@@ -78,13 +100,13 @@ def main():
         player.crouch(keys)  # Manejar agacharse
         player.apply_physics(dt, ax)
 
-    # Actualizar proyectiles
+        # Actualizar proyectiles
         for proj in projectiles:
             proj.update(dt)
-    # Eliminar proyectiles inactivos
+        # Eliminar proyectiles inactivos
         projectiles = [p for p in projectiles if p.active]
 
-    # Verificar colisión con el objetivo
+        # Verificar colisión con el objetivo
         hit = False
         for proj in projectiles:
             if proj.rect.colliderect(target.rect):
@@ -93,11 +115,12 @@ def main():
         if hit:
             target.respawn()
 
-        screen.fill(BG_COLOR)
-        ground_rect = pygame.Rect(0, SCREEN_HEIGHT - GROUND_HEIGHT, SCREEN_WIDTH, GROUND_HEIGHT)
-        pygame.draw.rect(screen, GROUND_COLOR, ground_rect)
-        player.draw(screen)
-    # Dibujar flecha de dirección de disparo si existe
+        #Dibujo: primero limpiar viewport
+        viewport.fill(config.BG_COLOR)
+        ground_rect = pygame.Rect(0, viewport_h - config.GROUND_HEIGHT, viewport_w, config.GROUND_HEIGHT)
+        pygame.draw.rect(viewport, config.GROUND_COLOR, ground_rect)
+        player.draw(viewport)
+        # Dibujar flecha de dirección de disparo si existe
         if shoot_dir:
             dx, dy = shoot_dir
             mag = (dx**2 + dy**2) ** 0.5
@@ -108,26 +131,30 @@ def main():
                 cx = player.rect.centerx
                 cy = player.rect.centery
                 tip = (int(cx + dx * arrow_len), int(cy + dy * arrow_len))
-                pygame.draw.line(screen, (80,200,255), (cx, cy), tip, 5)
+                pygame.draw.line(viewport, (80,200,255), (cx, cy), tip, 5)
                 # Dibujar cabeza de la flecha
                 perp = (-dy, dx)
                 head_len = 12
                 head_w = 7
                 left = (int(tip[0] - dx * head_len + perp[0] * head_w), int(tip[1] - dy * head_len + perp[1] * head_w))
                 right = (int(tip[0] - dx * head_len - perp[0] * head_w), int(tip[1] - dy * head_len - perp[1] * head_w))
-                pygame.draw.polygon(screen, (80,200,255), [tip, left, right])
+                pygame.draw.polygon(viewport, (80,200,255), [tip, left, right])
         for proj in projectiles:
-            proj.draw(screen)
-        target.draw(screen)
+            proj.draw(viewport)
+        target.draw(viewport)
 
         lines = [
             "Controles: A/D = mover | Space/W = saltar | S = agacharse | Flechas = disparar (puedes combinar para diagonales)",
             f"Vel: {player.vx:.0f} px/s | En suelo: {'Sí' if player.on_ground else 'No'} | Agachado: {'Sí' if player.crouching else 'No'} | Proyectiles: {len(projectiles)} | Objetivo: verde"
         ]
         for i, line in enumerate(lines):
-            txt = font.render(line, True, TEXT_COLOR)
-            screen.blit(txt, (10, 10 + i*18))
+            txt = font.render(line, True, config.TEXT_COLOR)
+            viewport.blit(txt, (10, 10 + i*18))
 
+        #Limpiar pantalla y dibujar bandas negras
+        screen.fill((0,0,0))  # Bandas negras
+        # Blitear viewport centrado
+        screen.blit(viewport, (viewport_x, viewport_y))
         pygame.display.flip()
 
     pygame.quit()

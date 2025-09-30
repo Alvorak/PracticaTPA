@@ -13,11 +13,8 @@ class Target:
 
     # Genera una posición aleatoria válida para el objetivo
     def random_position(self):
-        x = random.randint(50, config.SCREEN_WIDTH - 50 - self.w)
-        min_y = config.SCREEN_HEIGHT - config.GROUND_HEIGHT - 200
-        max_y = config.SCREEN_HEIGHT - config.GROUND_HEIGHT - self.h
-        y = random.randint(min_y, max_y)
-        return pygame.Rect(x, y, self.w, self.h)
+        # Usar la utilidad para asegurar que el objetivo esté dentro del viewport
+        return config.get_rect_in_viewport(self.w, self.h, margin_x=50, margin_y=50, ground=True)
 
     # Reaparece el objetivo en una nueva posición aleatoria
     def respawn(self):
