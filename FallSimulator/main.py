@@ -7,6 +7,8 @@ from constants import *
 from Entities.player import Player
 from Entities.projectile import Projectile
 from Entities.target import Target
+from Entities.platform import Platform
+
 # Función principal - El Game Loop del juego
 def main():
     pygame.init()
@@ -36,10 +38,21 @@ def main():
     viewport_x = (screen_w - viewport_w) // 2
     viewport_y = 0
 
-    #Inicializar entidades usando el viewport (Utilizar config para límites)
+    # Inicializar entidades usando el viewport (Utilizar config para límites)
     player = Player(viewport_w // 3, viewport_h - config.GROUND_HEIGHT - 90)
     projectiles = []
     target = Target()
+    
+    # Inicializamos las plataformas
+    ground_y = viewport_h - config.GROUND_HEIGHT
+    platforms = [
+        # Plataforma izquierda baja
+        Platform(100, ground_y - 150, 200, 20),
+        # Plataforma central flotante
+        Platform(viewport_w // 2 - 100, ground_y - 300, 200, 20),
+        # Plataforma derecha alta
+        Platform(viewport_w - 300, ground_y - 450, 200, 20)
+    ]
 
     running = True # Para controlar el bucle principal del juego, false para salir
     # Llevar registro de qué flechas están presionadas
@@ -98,7 +111,12 @@ def main():
 
         ax = player.handle_input_axis(keys)
         player.crouch(keys)  # Manejar agacharse
-        player.apply_physics(dt, ax)
+        
+        # Aplicar físicas al jugador
+        player.apply_physics(dt, ax) 
+        
+        # Manejar Colisiones después de la física
+        player.check_platform_collisions(platforms, ground_y, dt)
 
         # Actualizar proyectiles
         for proj in projectiles:
@@ -119,6 +137,11 @@ def main():
         viewport.fill(config.BG_COLOR)
         ground_rect = pygame.Rect(0, viewport_h - config.GROUND_HEIGHT, viewport_w, config.GROUND_HEIGHT)
         pygame.draw.rect(viewport, config.GROUND_COLOR, ground_rect)
+        
+        # Dibujar plataformas antes que al jugador
+        for platform in platforms:
+            platform.draw(viewport)
+
         player.draw(viewport)
         # Dibujar flecha de dirección de disparo si existe
         if shoot_dir:

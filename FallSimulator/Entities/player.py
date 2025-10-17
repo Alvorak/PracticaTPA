@@ -1,3 +1,4 @@
+# player.py
 import pygame
 import config
 from constants import *
@@ -51,6 +52,35 @@ class Player:
             old_bottom = self.rect.bottom
             self.rect.height = self.base_h
             self.rect.bottom = old_bottom  # Sube el rectángulo
+    
+    # Metodo para manejar colisiones con plataformas y el suelo base
+    def check_platform_collisions(self, platforms, ground_y, dt):
+        """Verifica y resuelve colisiones después de la aplicación de físicas."""
+
+        #Asumir que no está en el suelo hasta que se pruebe lo contrario
+        self.on_ground = False
+        
+        # Aplicar movimiento vertical
+        self.rect.y += int(self.vy * dt)
+        
+        # Verificar colisión con el suelo base
+        if self.rect.bottom >= ground_y:
+            self.rect.bottom = ground_y
+            self.vy = 0.0
+            self.on_ground = True
+            return # Si está en el suelo base, no verificamos más plataformas
+
+        # Verificar colisiones con plataformas
+        for platform in platforms:
+            if self.rect.colliderect(platform.rect):
+                # La velocidad vertical debe ser positiva (cayendo)
+                if self.vy >= 0:
+                    # Ajustar posición justo encima de la plataforma
+                    self.rect.bottom = platform.rect.top 
+                    self.vy = 0.0 #Para detener la caída
+                    self.on_ground = True #para indicar que está en el suelo
+                    break  # No necesitamos verificar más plataformas
+
 
     # Aplica la física de movimiento y fricción
     def apply_physics(self, dt, ax):
@@ -69,22 +99,23 @@ class Player:
             self.vx = config.MAX_SPEED
         if self.vx < -config.MAX_SPEED:
             self.vx = -config.MAX_SPEED
+        
+        # Aplicar gravedad a VY
         self.vy += config.GRAVITY * dt
+        
+        # Mover SOLO en X
         self.rect.x += int(self.vx * dt)
-        self.rect.y += int(self.vy * dt)
+        
+        # Limitar movimiento horizontal al viewport
         if self.rect.left < 0:
             self.rect.left = 0
             self.vx = 0
         if self.rect.right > config.VIEWPORT_WIDTH:
             self.rect.right = config.VIEWPORT_WIDTH
             self.vx = 0
-        # El suelo está en la base del área jugable (viewport)
-        ground_y = config.VIEWPORT_HEIGHT - config.GROUND_HEIGHT
-        if self.rect.bottom >= ground_y:
-            self.rect.bottom = ground_y
-            self.vy = 0.0
-            self.on_ground = True
-
+        
+    
+    #Draw que muestra al jugador en pantalla
     def draw(self, surface): # Dibuja el jugador en pantalla
         pygame.draw.rect(surface, self.color, self.rect)
         head_w = 10
