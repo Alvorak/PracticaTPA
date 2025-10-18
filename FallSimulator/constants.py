@@ -32,3 +32,14 @@ BG_COLOR = (30, 30, 40)
 GROUND_COLOR = (40, 40, 50)
 PLAYER_COLOR = (220, 40, 40)
 TEXT_COLOR = (230, 230, 230)
+
+
+MENU_OPTIONS = [ # ("Texto que se muestra", "accion que retorna el menú")
+    ("New Game!", "juego"),
+    ("Continue :D", "juego"),
+    ("Close :(", "salir")
+]
+
+
+escape_pulsado_time = 0.0
+escape_limite = 5.0  # segundos necesarios para salir del juego
