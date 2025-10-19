@@ -61,11 +61,13 @@ python -m venv .venv
 ```
 .venv\Scripts\Activate.ps1
 ```
-# (si da error de ejecución: Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass) es cuestion de permisos D: (sad, i know!)
+(si da error de ejecución: Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass)
+es cuestion de permisos D: (sad, i know!)
 
 # En Linux / Mac
-# source .venv/bin/activate
-
+```
+source .venv/bin/activate
+```
 3. Instalar dependencias
 
 pip install -r requirements.txt
