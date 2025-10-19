@@ -1,20 +1,30 @@
 import pygame
 import sys
-import config
-from constants import *
-from Entities.player import Player
-from Entities.projectile import Projectile
-from Entities.target import Target
-from Entities.platform import Platform
+import random
+from . import config
+from .constants import *
+from .Entities.player import Player
+from .Entities.projectile import Projectile
+from .Entities.target import Target
+from .Entities.platform import Platform
 
 class Game:
     def __init__(self, screen, lifes=3, puntos=0):
         self.screen = screen # Pantalla principal
         self.clock = pygame.time.Clock() # Reloj para controlar FPS
-        self.font = pygame.font.SysFont("Arial Unicode MS", 20) # Fuente para texto en pantalla
         self.running = True
         self.lifes = lifes
         self.puntos = puntos
+        self.escape_pulsado_time = 0.0
+      
+        if screen is not None:
+            self.clock = pygame.time.Clock()
+            self.font = pygame.font.SysFont("Arial Unicode MS", 20) # Fuente para texto en pantalla
+
+        else:  #para el modo test sin pantalla
+            self.clock = None
+            self.font = None
+
 
     def run(self):
         #Configuración de pantalla
@@ -148,3 +158,94 @@ class Game:
             pygame.display.flip()
 
         return "salir"
+    #PARA EL MODO TEST que pruebe jugar solo
+    def auto_play(self, steps=200):
+            """
+            Demo automática: mueve al personaje de formna aleatoria y dispara aleatoriamente. 
+            Solo para pruebas automáticas y testing.
+            steps: número de pasos (movimientos) de actualización a simular
+            """
+            if self.screen is None:
+                return  # no se puede jugar sin pantalla
+
+            # Configuración inicial igual que en run()
+            screen_w, screen_h = self.screen.get_size()
+            viewport_w = config.VIEWPORT_WIDTH
+            viewport_h = screen_h
+            config.VIEWPORT_HEIGHT = viewport_h
+            viewport = pygame.Surface((viewport_w, viewport_h))
+            viewport_x = (screen_w - viewport_w) // 2
+            viewport_y = 0
+
+            player = Player(viewport_w // 3, viewport_h - config.GROUND_HEIGHT - 90)
+            projectiles = []
+            target = Target()
+
+            ground_y = viewport_h - config.GROUND_HEIGHT
+            platforms = [
+                Platform(100, ground_y - 150, 200, 20),
+                Platform(viewport_w // 2 - 100, ground_y - 300, 200, 20),
+                Platform(viewport_w - 300, ground_y - 450, 200, 20)
+            ]
+
+            shoot_timer = 0.0 # tiempo desde el último disparo
+            shoot_interval = 0.15 # intervalo mínimo entre disparos
+
+            for step in range(steps): # cada paso 
+                dt = self.clock.tick(config.FPS) / 1000.0 # tiempo delta
+
+                # Movimientos aleatorios
+                move_dir = random.choice([-1, 0, 1]) # izquierda, quieto, derecha
+                jump = random.random() < 0.1  # saltar aleatoriamente
+                crouch = random.random() < 0.05# agacharse aleatoriamente
+
+                # Aplicamos el movimiento al jugador
+                player.vx = move_dir * player.speed
+                if jump:
+                    player.jump()
+                if crouch:
+                    player.crouch({'S': True}) # simulamos tecla S presionada
+
+                player.apply_physics(dt, player.vx, platforms, ground_y) # actualizar física del jugador => movimiento y colisiones
+
+                # Disparo aleatorio
+                if random.random() < 0.3:
+                    #elegimos aletoriamente una dirección de disparo en 8 direcciones (incluyendo diagonales)
+                    dx = random.choice([-1, 0, 1]) 
+                    dy = random.choice([-1, 0, 1])
+                    if dx != 0 or dy != 0:
+                        proj = Projectile(player.rect.centerx, player.rect.centery, 0)
+                        proj.vx, proj.vy = 600 * dx, 600 * dy
+                        def custom_update(self, dt):
+                            self.rect.x += int(self.vx * dt)
+                            self.rect.y += int(self.vy * dt)
+                            if (self.rect.right < 0 or self.rect.left > viewport_w or
+                                self.rect.bottom < 0 or self.rect.top > viewport_h):
+                                self.active = False
+                        proj.update = custom_update.__get__(proj)
+                        projectiles.append(proj)
+
+                # Actualizar proyectiles
+                for proj in projectiles:
+                    proj.update(dt)
+                projectiles = [p for p in projectiles if p.active]
+
+                # Colisiones con el objetivo
+                hit = any(proj.rect.colliderect(target.rect) for proj in projectiles)
+                if hit:
+                    target.respawn()
+                    self.puntos += 1
+
+                # Dibujo (sin gestión de eventos ni escape)
+                viewport.fill(config.BG_COLOR)
+                pygame.draw.rect(viewport, config.GROUND_COLOR, (0, viewport_h - config.GROUND_HEIGHT, viewport_w, config.GROUND_HEIGHT))
+                for platform in platforms:
+                    platform.draw(viewport)
+                player.draw(viewport)
+                for proj in projectiles:
+                    proj.draw(viewport)
+                target.draw(viewport)
+
+                self.screen.fill((0,0,0))
+                self.screen.blit(viewport, (viewport_x, viewport_y))
+                pygame.display.flip()

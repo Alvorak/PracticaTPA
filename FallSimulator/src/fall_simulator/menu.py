@@ -1,6 +1,6 @@
 import pygame
-import config
-from constants import *
+from . import config
+from .constants import *
 
 class Menu:
     def __init__(self, screen):

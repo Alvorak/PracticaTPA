@@ -1,3 +1,20 @@
+# Entorno virtual
+.venv/
+venv/
 __pycache__/
-**/__pycache__/
-**/*.pyc
+*.pyc
+
+# Archivos de Pygame / pruebas
+*.pyo
+*.pyd
+*.log
+
+# Documentación generada
+docs/
+
+# Config de VSCode
+.vscode/
+
+# Sistema operativo
+Thumbs.db
+.DS_Store
