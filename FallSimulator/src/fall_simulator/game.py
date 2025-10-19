@@ -9,17 +9,26 @@ from .Entities.target import Target
 from .Entities.platform import Platform
 
 class Game:
+    """Clase principal del juego. Maneja el bucle del juego, actualizaciones y renderizado (gameloop)"""
     def __init__(self, screen, lifes=3, puntos=0):
+        """Constructor de la clase Game."""
         self.screen = screen # Pantalla principal
+        """Pantalla principal del juego."""
         self.clock = pygame.time.Clock() # Reloj para controlar FPS
+        """Reloj para los FPS del juego."""
         self.running = True
+        """Chequea si el juego está corriendo."""
         self.lifes = lifes
+        """Vidas del jugador."""
         self.puntos = puntos
+        """Puntos del jugador."""
         self.escape_pulsado_time = 0.0
+        """El tiempo en segundos que hay que mantener ESC pulsado para salir del juego."""
       
         if screen is not None:
             self.clock = pygame.time.Clock()
             self.font = pygame.font.SysFont("Arial Unicode MS", 20) # Fuente para texto en pantalla
+            """Fuente para el texto en pantalla."""
 
         else:  #para el modo test sin pantalla
             self.clock = None
@@ -27,21 +36,32 @@ class Game:
 
 
     def run(self):
+        """Método principal del bucle del juego."""
         #Configuración de pantalla
         screen_w, screen_h = self.screen.get_size()
+        """Ancho y alto de la pantalla."""
 
         # Crear superficie del viewport jugable
         viewport_w = config.VIEWPORT_WIDTH
+        """Ancho del viewport jugable."""
         viewport_h = screen_h
+        """Alto del viewport jugable."""
         config.VIEWPORT_HEIGHT = viewport_h
+        """Altura del viewport jugable."""
         viewport = pygame.Surface((viewport_w, viewport_h))
+        """Superficie del viewport jugable."""
         viewport_x = (screen_w - viewport_w) // 2
+        """Posición X del viewport en la pantalla."""
         viewport_y = 0
+        """Posición Y del viewport en la pantalla."""
 
         # Inicializar entidades
         player = Player(viewport_w // 3, viewport_h - config.GROUND_HEIGHT - 90)
+        """jugador del juego"""
         projectiles = []
+        """Lista de proyectiles activos."""
         target = Target()
+        """Objetivo a golpear."""
 
         ground_y = viewport_h - config.GROUND_HEIGHT
         platforms = [
@@ -51,6 +71,7 @@ class Game:
         ]
 
         arrow_keys = {pygame.K_UP: False, pygame.K_DOWN: False, pygame.K_LEFT: False, pygame.K_RIGHT: False}
+        """Flechas de dirección para disparar."""
         shoot_timer = 0.0
         shoot_interval = 0.15
         
@@ -120,6 +141,7 @@ class Game:
 
             # Colisiones con el objetivo
             hit = any(proj.rect.colliderect(target.rect) for proj in projectiles)
+            """Golpear el objetivo con algún (any) proyectil."""
             if hit:
                 target.respawn()
                 self.puntos += 1
@@ -140,6 +162,7 @@ class Game:
                 f"Vel: {player.vx:.0f}px/s | Suelo: {'Sí' if player.on_ground else 'No'} | Agachado: {'Sí' if player.crouching else 'No'}",
                 f"Vidas: {self.lifes} | Puntos : {self.puntos}"
             ]
+            """Lista de líneas de texto para mostrar en pantalla."""
             for i, line in enumerate(lines):
                 txt = self.font.render(line, True, config.TEXT_COLOR)
                 viewport.blit(txt, (10, 10 + i*18))
@@ -182,17 +205,21 @@ class Game:
             target = Target()
 
             ground_y = viewport_h - config.GROUND_HEIGHT
+            
             platforms = [
                 Platform(100, ground_y - 150, 200, 20),
                 Platform(viewport_w // 2 - 100, ground_y - 300, 200, 20),
                 Platform(viewport_w - 300, ground_y - 450, 200, 20)
             ]
+            """Lista de plataformas en el juego."""
 
             shoot_timer = 0.0 # tiempo desde el último disparo
             shoot_interval = 0.15 # intervalo mínimo entre disparos
+            """Intervalo mínimo entre disparos."""
 
             for step in range(steps): # cada paso 
                 dt = self.clock.tick(config.FPS) / 1000.0 # tiempo delta
+                """Tiempo delta entre frames en segundos."""
 
                 # Movimientos aleatorios
                 move_dir = random.choice([-1, 0, 1]) # izquierda, quieto, derecha

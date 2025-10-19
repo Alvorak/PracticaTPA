@@ -4,7 +4,7 @@
         para el modo demo (auto-juego simplificado):
         python -m fall_simulator --demo
         y para los test: pytest
-	"""
+"""
 import pygame
 import sys
 from .menu import Menu
@@ -26,6 +26,7 @@ def main(demo=False):
     pygame.display.set_caption(GameTitle)
 
     estado = "menu"
+    """El estado inicial del juego es el menú."""
     menu = Menu(screen)
     game = Game(screen)
 
@@ -46,4 +47,5 @@ def main(demo=False):
 
 if __name__ == "__main__":
     demo = "--demo" in sys.argv
+    """Probamos una demo si se pasa el argumento --demo"""
     main(demo)

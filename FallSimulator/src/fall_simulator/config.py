@@ -20,6 +20,7 @@ def get_rect_in_viewport(w, h, margin_x=0, margin_y=0, ground=True):
 	return pygame.Rect(x, y, w, h)
 
 def is_pressed(keys, key):
+	"""La función is_pressed verifica si una tecla específica está presionada."""
 	try:
 		return keys[key]
 	except (TypeError, IndexError, KeyError, AttributeError):

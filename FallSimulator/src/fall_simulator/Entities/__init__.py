@@ -1,0 +1,1 @@
+"""Archivo init para el paquete Entities, permitiendo la importación de submódulos."""

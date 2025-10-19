@@ -5,22 +5,35 @@ from ..constants import *
 
 # Clase que representa al jugador
 class Player:
+    """Clase que representa al jugador y maneja su física y controles."""
     def __init__(self, x, y, w=50, h=90, color=config.PLAYER_COLOR):
         # Inicializa el jugador en la posición (x, y) con tamaño y color
         self.base_w = w  # Ancho base
+        """Ancho base del jugador."""
         self.base_h = h  # Alto base
+        """Alto base del jugador."""
         self.crouch_h = h // 2  # Alto al agacharse
+        """Alto del jugador al agacharse."""
         self.rect = pygame.Rect(int(x), int(y), w, h)  # Rectángulo del jugador
+        """Rectángulo que representa la posición y tamaño del jugador."""
         self.vx = 0.0  # Velocidad horizontal
+        """Velocidad horizontal del jugador."""
         self.vy = 0.0  # Velocidad vertical
+        """Velocidad vertical del jugador."""
         self.color = color  # Color del jugador
+        """Color del jugador."""
         self.on_ground = False  # ¿Está en el suelo?
+        """Indica si el jugador está en el suelo."""
         self.facing = 1  # Dirección a la que mira (1: derecha, -1: izquierda)
+        """Dirección a la que mira el jugador (1: derecha, -1: izquierda)."""
         self.crouching = False  # ¿Está agachado?
-        self.speed = 200      # <--- velocidad de movimiento (modo automático)
+        """Indica si el jugador está agachado."""
+        self.speed = 200      # velocidad de movimiento (modo automático)
+        """Velocidad de movimiento del jugador en modo automático."""
 
     # Maneja el input de movimiento horizontal (A/D)
     def handle_input_axis(self, keys):
+        """Maneja el input de movimiento horizontal y devuelve la aceleración."""
         ax = 0.0
         if keys[pygame.K_a]:
             ax -= config.MOVE_ACCEL  # Mover a la izquierda
@@ -32,17 +45,20 @@ class Player:
 
     # Hace saltar al jugador si está en el suelo
     def jump(self):
+        """Hace que el jugador salte si está en el suelo."""
         if self.on_ground:
             self.vy = -config.JUMP_VELOCITY
             self.on_ground = False
 
     # Corta el salto si se suelta la tecla antes de tiempo
     def short_jump_cut(self):
+        """Corta el salto si se suelta la tecla antes de tiempo."""
         if self.vy < 0:
             self.vy *= 0.45
 
     # Maneja el estado de agacharse
     def crouch(self, keys):
+        """Maneja el estado de agacharse del jugador."""
         want_crouch = config.is_pressed(keys, pygame.K_s)
         if want_crouch and not self.crouching:
             self.crouching = True
@@ -55,6 +71,7 @@ class Player:
             self.rect.bottom = old_bottom  # Sube el rectángulo
     # Aplica física al jugador (movimiento y colisiones)
     def apply_physics(self, dt, ax, platforms, ground_y):
+        """Aplica física al jugador, incluyendo movimiento y colisiones."""
         #Parte horizontal
         self.vx += ax * dt
         if ax == 0:
@@ -87,6 +104,7 @@ class Player:
 
     #Cplisiones horizontales => para plataformas
     def check_horizontal_collisions(self, platforms):
+        """Método para chequear colisiones horizontales con plataformas."""
         for platform in platforms:
             if self.rect.colliderect(platform.rect):
                 vertical_overlap = min(self.rect.bottom, platform.rect.bottom) - max(self.rect.top, platform.rect.top)
@@ -98,18 +116,20 @@ class Player:
                     self.rect.left = platform.rect.right
                 self.vx = 0
 
-    #Colisiones verticales => para plataformas y suelo
+    #Colisiones verticales para plataformas y suelo
     def check_vertical_collisions(self, platforms, ground_y, prev_bottom, dt):
+        """Método para chequear colisiones verticales con plataformas y suelo."""
         # Colisión con el suelo
         if self.rect.bottom >= ground_y:
-            if self.vy > 0:  #solo frena si cae => evita bugs al saltar justo en el suelo
+            if self.vy > 0:  #solo frena si cae, por tanto esto evita bugs.
                 self.vy = 0
             self.rect.bottom = ground_y
             self.on_ground = True
         else:
             self.on_ground = False
 
-        snap_margin = max(3, abs(int(self.vy * dt)), 1) # Margen para "aterrizar" en plataformas rápidas => no traspasarlas
+        snap_margin = max(3, abs(int(self.vy * dt)), 1) 
+        """Margen para "aterrizar" en plataformas rápidas."""
 
         #Plataformas del juego y sus colisiones
         for platform in platforms:
@@ -127,9 +147,14 @@ class Player:
     
     #Draw que muestra al jugador en pantalla
     def draw(self, surface): # Dibuja el jugador en pantalla
+        """Dibuja el jugador en la superficie dada."""
         pygame.draw.rect(surface, self.color, self.rect)
         head_w = 10
+        """Ancho para dibujar los ojos del jugador."""
         cx = self.rect.centerx + (self.facing * (self.rect.width // 2 + 1))
+        """Centro X para dibujar los ojos del jugador."""
         cy_top = self.rect.top + 18
+        """Centro Y para dibujar los ojos del jugador."""
         points = [(cx, cy_top), (cx + (-self.facing)*head_w, cy_top+7), (cx + (-self.facing)*head_w, cy_top-7)]
+        """Puntos para dibujar los ojos del jugador."""
         pygame.draw.polygon(surface, (200,200,200), points) # Dibuja un triangulo como orientacion de los ojos del jugador => mira hacia donde se mueve
