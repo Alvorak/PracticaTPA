@@ -8,11 +8,13 @@ from Entities.target import Target
 from Entities.platform import Platform
 
 class Game:
-    def __init__(self, screen):
+    def __init__(self, screen, lifes=3, puntos=0):
         self.screen = screen # Pantalla principal
         self.clock = pygame.time.Clock() # Reloj para controlar FPS
         self.font = pygame.font.SysFont("Arial Unicode MS", 20) # Fuente para texto en pantalla
         self.running = True
+        self.lifes = lifes
+        self.puntos = puntos
 
     def run(self):
         #Configuración de pantalla
@@ -100,8 +102,8 @@ class Game:
             # Actualizaciones de entidades del jugador
             ax = player.handle_input_axis(keys)
             player.crouch(keys)
-            player.apply_physics(dt, ax)
-            player.check_platform_collisions(platforms, ground_y, dt)
+            player.apply_physics(dt, ax, platforms, ground_y)
+            # Actualizar proyectiles
             for proj in projectiles:
                 proj.update(dt)
             projectiles = [p for p in projectiles if p.active]
@@ -110,6 +112,7 @@ class Game:
             hit = any(proj.rect.colliderect(target.rect) for proj in projectiles)
             if hit:
                 target.respawn()
+                self.puntos += 1
 
             # Dibujo 
             viewport.fill(config.BG_COLOR)
@@ -124,7 +127,8 @@ class Game:
             # Info debug => texto en pantalla
             lines = [
                 "Controles: A/D = mover | Space/W = saltar | S = agacharse | Flechas = disparar (puedes combinar para diagonales)",
-                f"Vel: {player.vx:.0f}px/s | Suelo: {'Sí' if player.on_ground else 'No'} | Agachado: {'Sí' if player.crouching else 'No'}"
+                f"Vel: {player.vx:.0f}px/s | Suelo: {'Sí' if player.on_ground else 'No'} | Agachado: {'Sí' if player.crouching else 'No'}",
+                f"Vidas: {self.lifes} | Puntos : {self.puntos}"
             ]
             for i, line in enumerate(lines):
                 txt = self.font.render(line, True, config.TEXT_COLOR)

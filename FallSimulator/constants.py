@@ -21,7 +21,7 @@ FULLSCREEN = True  # Cambia a False para modo ventana
 # Físicas y juego
 FPS = 60
 GROUND_HEIGHT = 80
-GRAVITY = 2500.0
+GRAVITY = 2000.0
 MOVE_ACCEL = 8000.0
 MAX_SPEED = 380.0
 FRICTION = 6000.0
