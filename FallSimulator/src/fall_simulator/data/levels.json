@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "points_needed": 3,
+    "num_targets": 3,
+    "platforms": [
+      { "x_frac": 0.05, "y_from_ground": 150, "w": 200, "h": 20 },
+      { "x_frac": 0.5,  "y_from_ground": 300, "w": 200, "h": 20 },
+      { "x_frac": 0.95, "y_from_ground": 450, "w": 200, "h": 20 }
+    ]
+  },
+  {
+    "id": 2,
+    "points_needed": 6,
+    "num_targets": 2,
+    "platforms": [
+      { "x_frac": 0.1, "y_from_ground": 100, "w": 160, "h": 20 },
+      { "x_frac": 0.4, "y_from_ground": 230, "w": 180, "h": 20 },
+      { "x_frac": 0.7, "y_from_ground": 360, "w": 220, "h": 20 }
+    ]
+  }
+]

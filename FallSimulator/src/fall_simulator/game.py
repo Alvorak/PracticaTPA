@@ -7,6 +7,7 @@ from .Entities.player import Player
 from .Entities.projectile import Projectile
 from .Entities.target import Target
 from .Entities.platform import Platform
+from .levels import load_levels
 
 class Game:
     """Clase principal del juego. Maneja el bucle del juego, actualizaciones y renderizado (gameloop)"""
@@ -22,6 +23,13 @@ class Game:
         """Vidas del jugador."""
         self.puntos = puntos
         """Puntos del jugador."""
+        # Cargar niveles
+        try:
+            self.levels = load_levels() # Carga niveles desde JSON
+        except Exception:
+            # Si no se encuentra el archivo o hay error, usar un fallback mínimo
+            self.levels = []
+        self.current_level_index = 0
         self.escape_pulsado_time = 0.0
         """El tiempo en segundos que hay que mantener ESC pulsado para salir del juego."""
       
@@ -60,16 +68,25 @@ class Game:
         """jugador del juego"""
         projectiles = []
         """Lista de proyectiles activos."""
-        target = Target()
-        """Objetivo a golpear."""
+        # Construir plataformas y objetivos a partir del nivel actual
+        ground_y = viewport_h - config.GROUND_HEIGHT # Posición Y del suelo
+        if self.levels and 0 <= self.current_level_index < len(self.levels): # Si hay niveles cargados
+            lvl = self.levels[self.current_level_index] # Nivel actual
+            platforms = lvl.create_platforms(viewport_w, ground_y, Platform) # crear plataformas
+            # crear lista de objetivos segun num_targets 
+            targets = [Target() for _ in range(lvl.num_targets)] 
+            current_points_needed = lvl.points_needed # puntos necesarios para completar el nivel
+        else:
+            # Fallback: plataformas hardcodeadas (comportamiento original)
+            platforms = [
+                Platform(100, ground_y - 150, 200, 20),
+                Platform(viewport_w // 2 - 100, ground_y - 300, 200, 20),
+                Platform(viewport_w - 300, ground_y - 450, 200, 20)
+            ]
+            targets = [Target()]
+            current_points_needed = 999999
 
-        ground_y = viewport_h - config.GROUND_HEIGHT
-        platforms = [
-            Platform(100, ground_y - 150, 200, 20),
-            Platform(viewport_w // 2 - 100, ground_y - 300, 200, 20),
-            Platform(viewport_w - 300, ground_y - 450, 200, 20)
-        ]
-
+        # ground_y ya inicializado arriba
         arrow_keys = {pygame.K_UP: False, pygame.K_DOWN: False, pygame.K_LEFT: False, pygame.K_RIGHT: False}
         """Flechas de dirección para disparar."""
         shoot_timer = 0.0
@@ -139,12 +156,43 @@ class Game:
                 proj.update(dt)
             projectiles = [p for p in projectiles if p.active]
 
-            # Colisiones con el objetivo
-            hit = any(proj.rect.colliderect(target.rect) for proj in projectiles)
-            """Golpear el objetivo con algún (any) proyectil."""
-            if hit:
-                target.respawn()
+            # Colisiones con los objetivos
+            hit_index = None
+            for i, t in enumerate(targets):
+                if any(proj.rect.colliderect(t.rect) for proj in projectiles):
+                    hit_index = i
+                    break
+            if hit_index is not None:
+                targets[hit_index].respawn()
                 self.puntos += 1
+
+                # Comprobar si alcanzamos el umbral para pasar de nivel
+                if self.levels and self.current_level_index < len(self.levels): # Si hay niveles cargados
+                    lvl = self.levels[self.current_level_index] # Nivel actual
+                    if self.puntos >= lvl.points_needed: # Si se alcanzaron los puntos necesarios
+                        # Mostrar pantalla de transición y cargar siguiente nivel
+                        self._show_next_level_popup(self.screen, viewport, viewport_x, viewport_y, self.current_level_index + 1)
+                        self.current_level_index += 1 # avanzar al siguiente nivel
+                        # reset de estado que puede quedar activo al cambiar de nivel (asi evitamos apariciones raras)
+                        projectiles = [] 
+                        shoot_timer = 0.0
+                        # limpiar teclas de flecha presionadas para evitar disparo continuo
+                        arrow_keys = {pygame.K_UP: False, pygame.K_DOWN: False, pygame.K_LEFT: False, pygame.K_RIGHT: False}
+                        # resetear velocidades y posición ligera del jugador para evitar inercia entre niveles
+                        try:
+                            player.vx = 0 
+                            player.vy = 0
+                        except Exception:
+                            pass
+                        # si hay siguiente nivel, recargar plataformas y targets
+                        if self.current_level_index < len(self.levels):
+                            lvl = self.levels[self.current_level_index]
+                            platforms = lvl.create_platforms(viewport_w, ground_y, Platform)
+                            targets = [Target() for _ in range(lvl.num_targets)]
+                        else:
+                            # No hay más niveles -> mostrar mensaje de victoria y game over
+                            self._show_victory_popup(self.screen, viewport, viewport_x, viewport_y)
+                            return "salir"
 
             # Dibujo 
             viewport.fill(config.BG_COLOR)
@@ -154,7 +202,8 @@ class Game:
             player.draw(viewport)
             for proj in projectiles:
                 proj.draw(viewport)
-            target.draw(viewport)
+            for t in targets:
+                t.draw(viewport)
 
             # Info debug => texto en pantalla
             lines = [
@@ -181,6 +230,60 @@ class Game:
             pygame.display.flip()
 
         return "salir"
+
+    def _show_next_level_popup(self, screen, viewport, viewport_x, viewport_y, next_level_number): 
+        """Muestra un overlay modal indicando el siguiente nivel y espera interacción del jugador."""
+        if screen is None: # Si no hay pantalla, no se puede mostrar el popup
+            return
+        overlay = pygame.Surface(viewport.get_size(), pygame.SRCALPHA) # Superficie transparente
+        clock = self.clock or pygame.time.Clock() # Reloj para controlar FPS
+        while True: 
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.KEYDOWN and event.key in (pygame.K_SPACE, pygame.K_RETURN):
+                    return
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    return
+            # Dibujar overlay
+            overlay.fill((0, 0, 0, 180))
+            viewport.blit(overlay, (0, 0))
+            title = self.font.render(f"Nivel {next_level_number} completado!", True, (255, 255, 255))
+            hint = self.font.render("Pulsa Espacio o haz click para continuar", True, (200, 200, 200))
+            viewport.blit(title, (viewport.get_width() // 2 - title.get_width() // 2, viewport.get_height() // 2 - 30))
+            viewport.blit(hint, (viewport.get_width() // 2 - hint.get_width() // 2, viewport.get_height() // 2 + 10))
+            screen.fill((0, 0, 0))
+            screen.blit(viewport, (viewport_x, viewport_y))
+            pygame.display.flip()
+            clock.tick(30)
+
+    def _show_victory_popup(self, screen, viewport, viewport_x, viewport_y):
+        """Muestra un overlay final indicando victoria y espera interacción para salir."""
+        if screen is None: # Si no hay pantalla, no se puede mostrar el popup
+            return
+        overlay = pygame.Surface(viewport.get_size(), pygame.SRCALPHA) # Superficie transparente
+        clock = self.clock or pygame.time.Clock()
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.KEYDOWN and event.key in (pygame.K_SPACE, pygame.K_RETURN, pygame.K_ESCAPE):
+                    return
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    return
+            # Dibujar overlay
+            overlay.fill((0, 0, 0, 200))
+            viewport.blit(overlay, (0, 0))
+            title = self.font.render("¡Has completado todos los niveles!", True, (255, 220, 100)) #game over
+            hint = self.font.render("Pulsa Espacio para salir", True, (220, 220, 220))
+            viewport.blit(title, (viewport.get_width() // 2 - title.get_width() // 2, viewport.get_height() // 2 - 30))
+            viewport.blit(hint, (viewport.get_width() // 2 - hint.get_width() // 2, viewport.get_height() // 2 + 10))
+            screen.fill((0, 0, 0))
+            screen.blit(viewport, (viewport_x, viewport_y))
+            pygame.display.flip()
+            clock.tick(30)
     #PARA EL MODO TEST que pruebe jugar solo
     def auto_play(self, steps=200):
             """
