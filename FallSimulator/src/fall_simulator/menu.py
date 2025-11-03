@@ -7,8 +7,10 @@ import pygame
 from . import config
 from .constants import *
 
+
 class Menu:
     """Clase que maneja el menú principal del juego"""
+
     def __init__(self, screen):
         """Inicializa el menú con la pantalla dada"""
         self.screen = screen
@@ -17,7 +19,9 @@ class Menu:
         """Fuente para las opciones del menú"""
         self.options = MENU_OPTIONS
         """Opciones del menú: lista de tuplas (texto, acción)"""
-        self.title_font = pygame.font.SysFont("Comic Sans MS", 100, bold=True) #para el titulo del juego
+        self.title_font = pygame.font.SysFont(
+            "Comic Sans MS", 100, bold=True
+        )  # para el titulo del juego
         """Fuente para el título del juego"""
         self.selected = 0
         """Índice de la opción seleccionada"""
@@ -46,7 +50,7 @@ class Menu:
     def draw(self):
         """Dibuja el menú en la pantalla"""
         self.screen.fill((20, 20, 20))
-        #Dibujar el título del juego
+        # Dibujar el título del juego
         title_text = config.GameTitle
         """Texto del título del juego."""
         title_surf = self.title_font.render(title_text, True, (255, 215, 0))  # dorado
@@ -58,5 +62,5 @@ class Menu:
         for i, (text, _) in enumerate(self.options):
             color = (255, 255, 0) if i == self.selected else (200, 200, 200)
             surf = self.font.render(text, True, color)
-            rect = surf.get_rect(center=(self.screen.get_width()//2, 250 + i * 80))
+            rect = surf.get_rect(center=(self.screen.get_width() // 2, 250 + i * 80))
             self.screen.blit(surf, rect)

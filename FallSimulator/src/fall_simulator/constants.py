@@ -51,10 +51,10 @@ TEXT_COLOR = (230, 230, 230)
 """Color del texto."""
 
 
-MENU_OPTIONS = [ # ("Texto que se muestra", "accion que retorna el menú")
+MENU_OPTIONS = [  # ("Texto que se muestra", "accion que retorna el menú")
     ("New Game!", "nuevo"),
     ("Continue :D", "continuar"),
-    ("Close :(", "salir")
+    ("Close :(", "salir"),
 ]
 """Opciones del menú principal."""
 

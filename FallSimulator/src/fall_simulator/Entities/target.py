@@ -3,10 +3,12 @@ import random
 from .. import config
 from ..constants import *
 
+
 # Clase que representa el objetivo a golpear
 class Target:
     """Clase que representa el objetivo a golpear en el juego."""
-    def __init__(self, w=30, h=30, color=(80,255,80)):
+
+    def __init__(self, w=30, h=30, color=(80, 255, 80)):
         """Constructor del objetivo, inicializando tamaño, color y posición aleatoria."""
         # Inicializa el objetivo con tamaño y color, y lo coloca en una posición aleatoria
         self.w = w  # Ancho del objetivo
@@ -22,8 +24,9 @@ class Target:
     def random_position(self):
         """Una posición aleatoria en la que aparecerá el objetivo."""
         # Usar la utilidad para asegurar que el objetivo esté dentro del viewport
-        return config.get_rect_in_viewport(self.w, self.h, margin_x=50, margin_y=50, ground=True)
-        
+        return config.get_rect_in_viewport(
+            self.w, self.h, margin_x=50, margin_y=50, ground=True
+        )
 
     # Reaparece el objetivo en una nueva posición aleatoria
     def respawn(self):

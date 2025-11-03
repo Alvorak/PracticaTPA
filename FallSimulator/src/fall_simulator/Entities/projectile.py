@@ -1,16 +1,19 @@
-
 import pygame
 from .. import config
+
 
 # Clase que representa un proyectil disparado por el jugador
 class Projectile:
     """Clase que representa un proyectil disparado por el jugador."""
-    def __init__(self, x, y, direction, speed=600, w=12, h=6, color=(255,255,80)):
+
+    def __init__(self, x, y, direction, speed=600, w=12, h=6, color=(255, 255, 80)):
         """Constructor del proyectil."""
         # Inicializa el proyectil en la posición (x, y) con dirección y velocidad
         self.rect = pygame.Rect(int(x), int(y), w, h)  # Rectángulo del proyectil
         """Rectángulo que representa la posición y tamaño del proyectil."""
-        self.direction = direction  # Dirección de movimiento (1: derecha, -1: izquierda)
+        self.direction = (
+            direction  # Dirección de movimiento (1: derecha, -1: izquierda)
+        )
         """Dirección de movimiento del proyectil (1: derecha, -1: izquierda)."""
         self.speed = speed  # Velocidad del proyectil
         """Velocidad del proyectil."""
@@ -18,6 +21,7 @@ class Projectile:
         """Color del proyectil."""
         self.active = True  # Si el proyectil está activo
         """Indica si el proyectil está activo."""
+
     # Actualiza la posición del proyectil
     def update(self, dt):
         """Método para actualizar la posición del proyectil."""

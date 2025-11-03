@@ -1,16 +1,18 @@
 """
-	Para ejecutar el juego, hay que estar en el directorio FallSimulator/src y ejecutar:
-        python -m fall_simulator
-        para el modo demo (auto-juego simplificado):
-        python -m fall_simulator --demo
-        y para los test: pytest
+Para ejecutar el juego, hay que estar en el directorio FallSimulator/src y ejecutar:
+python -m fall_simulator
+para el modo demo (auto-juego simplificado):
+python -m fall_simulator --demo
+y para los test: pytest
 """
+
 import pygame
 import sys
 from .menu import Menu
 from .game import Game
 from . import config
 from .constants import GameTitle
+
 
 def main(demo=False):
     pygame.init()
@@ -22,7 +24,9 @@ def main(demo=False):
             (display_info.current_w, display_info.current_h), pygame.FULLSCREEN
         )
     else:
-        screen = pygame.display.set_mode((config.VIEWPORT_WIDTH, config.VIEWPORT_HEIGHT))
+        screen = pygame.display.set_mode(
+            (config.VIEWPORT_WIDTH, config.VIEWPORT_HEIGHT)
+        )
     pygame.display.set_caption(GameTitle)
 
     estado = "menu"
@@ -37,6 +41,7 @@ def main(demo=False):
         return
     # Bucle normal
     from . import savegame
+
     while estado != "salir":
         if estado == "menu":
             estado = menu.run()
@@ -50,9 +55,9 @@ def main(demo=False):
             # Continuar: intentar cargar guardado y crear Game con esos valores
             s = savegame.load_game()
             if s:
-                lvl = int(s.get('level_index', 0))
-                pts = int(s.get('puntos', 0))
-                lifes = int(s.get('lifes', 3))
+                lvl = int(s.get("level_index", 0))
+                pts = int(s.get("puntos", 0))
+                lifes = int(s.get("lifes", 3))
                 game = Game(screen, lifes=lifes, puntos=pts, current_level_index=lvl)
             else:
                 game = Game(screen)
@@ -60,6 +65,7 @@ def main(demo=False):
             estado = "salir" if result == "salir" else "menu"
 
     pygame.quit()
+
 
 if __name__ == "__main__":
     demo = "--demo" in sys.argv

@@ -1,0 +1,8 @@
+[tool.black]
+# Longitud de línea preferida. Otras opciones son: 100, 120, 88.
+line-length = 88
+# Para las versiones concretas de Python, puedes añadir target-version
+# target-version = ["py310"]
+
+# Excluimos algunos paths comunes (Black tiene por defecto una buena exclusión, esto es extra)
+exclude = '\\.(git|hg|svn)\\b|\\.venv|venv|__pycache__|build|dist|\.eggs'

@@ -1,0 +1,6 @@
+repos:
+  - repo: https://github.com/psf/black # Repositorio de black
+    rev: stable # Usa la última versión estable de black
+    hooks:
+      - id: black # Formateador de código
+        language_version: python3 # Usa python3 del entorno virtual

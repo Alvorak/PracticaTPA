@@ -3,9 +3,11 @@ import pygame
 from .. import config
 from ..constants import *
 
+
 # Clase que representa al jugador
 class Player:
     """Clase que representa al jugador y maneja su física y controles."""
+
     def __init__(self, x, y, w=50, h=90, color=config.PLAYER_COLOR):
         # Inicializa el jugador en la posición (x, y) con tamaño y color
         self.base_w = w  # Ancho base
@@ -28,7 +30,7 @@ class Player:
         """Dirección a la que mira el jugador (1: derecha, -1: izquierda)."""
         self.crouching = False  # ¿Está agachado?
         """Indica si el jugador está agachado."""
-        self.speed = 200      # velocidad de movimiento (modo automático)
+        self.speed = 200  # velocidad de movimiento (modo automático)
         """Velocidad de movimiento del jugador en modo automático."""
 
     # Maneja el input de movimiento horizontal (A/D)
@@ -69,10 +71,11 @@ class Player:
             old_bottom = self.rect.bottom
             self.rect.height = self.base_h
             self.rect.bottom = old_bottom  # Sube el rectángulo
+
     # Aplica física al jugador (movimiento y colisiones)
     def apply_physics(self, dt, ax, platforms, ground_y):
         """Aplica física al jugador, incluyendo movimiento y colisiones."""
-        #Parte horizontal
+        # Parte horizontal
         self.vx += ax * dt
         if ax == 0:
             if self.vx > 0:
@@ -102,12 +105,14 @@ class Player:
             self.rect.right = config.VIEWPORT_WIDTH
             self.vx = 0
 
-    #Cplisiones horizontales => para plataformas
+    # Cplisiones horizontales => para plataformas
     def check_horizontal_collisions(self, platforms):
         """Método para chequear colisiones horizontales con plataformas."""
         for platform in platforms:
             if self.rect.colliderect(platform.rect):
-                vertical_overlap = min(self.rect.bottom, platform.rect.bottom) - max(self.rect.top, platform.rect.top)
+                vertical_overlap = min(self.rect.bottom, platform.rect.bottom) - max(
+                    self.rect.top, platform.rect.top
+                )
                 if vertical_overlap <= 0:
                     continue
                 if self.vx > 0:
@@ -116,37 +121,41 @@ class Player:
                     self.rect.left = platform.rect.right
                 self.vx = 0
 
-    #Colisiones verticales para plataformas y suelo
+    # Colisiones verticales para plataformas y suelo
     def check_vertical_collisions(self, platforms, ground_y, prev_bottom, dt):
         """Método para chequear colisiones verticales con plataformas y suelo."""
         # Colisión con el suelo
         if self.rect.bottom >= ground_y:
-            if self.vy > 0:  #solo frena si cae, por tanto esto evita bugs.
+            if self.vy > 0:  # solo frena si cae, por tanto esto evita bugs.
                 self.vy = 0
             self.rect.bottom = ground_y
             self.on_ground = True
         else:
             self.on_ground = False
 
-        snap_margin = max(3, abs(int(self.vy * dt)), 1) 
+        snap_margin = max(3, abs(int(self.vy * dt)), 1)
         """Margen para "aterrizar" en plataformas rápidas."""
 
-        #Plataformas del juego y sus colisiones
+        # Plataformas del juego y sus colisiones
         for platform in platforms:
             plat_top = platform.rect.top
             # detectar cruzando top desde arriba
-            if self.vy >= 0 and prev_bottom <= plat_top + snap_margin and self.rect.bottom >= plat_top - snap_margin:
-                if self.rect.right > platform.rect.left and self.rect.left < platform.rect.right:
+            if (
+                self.vy >= 0
+                and prev_bottom <= plat_top + snap_margin
+                and self.rect.bottom >= plat_top - snap_margin
+            ):
+                if (
+                    self.rect.right > platform.rect.left
+                    and self.rect.left < platform.rect.right
+                ):
                     self.rect.bottom = plat_top
                     self.vy = 0
                     self.on_ground = True
                     break
 
-
-    
-    
-    #Draw que muestra al jugador en pantalla
-    def draw(self, surface): # Dibuja el jugador en pantalla
+    # Draw que muestra al jugador en pantalla
+    def draw(self, surface):  # Dibuja el jugador en pantalla
         """Dibuja el jugador en la superficie dada."""
         pygame.draw.rect(surface, self.color, self.rect)
         head_w = 10
@@ -155,6 +164,12 @@ class Player:
         """Centro X para dibujar los ojos del jugador."""
         cy_top = self.rect.top + 18
         """Centro Y para dibujar los ojos del jugador."""
-        points = [(cx, cy_top), (cx + (-self.facing)*head_w, cy_top+7), (cx + (-self.facing)*head_w, cy_top-7)]
+        points = [
+            (cx, cy_top),
+            (cx + (-self.facing) * head_w, cy_top + 7),
+            (cx + (-self.facing) * head_w, cy_top - 7),
+        ]
         """Puntos para dibujar los ojos del jugador."""
-        pygame.draw.polygon(surface, (200,200,200), points) # Dibuja un triangulo como orientacion de los ojos del jugador => mira hacia donde se mueve
+        pygame.draw.polygon(
+            surface, (200, 200, 200), points
+        )  # Dibuja un triangulo como orientacion de los ojos del jugador => mira hacia donde se mueve
