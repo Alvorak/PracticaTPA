@@ -11,12 +11,35 @@
   },
   {
     "id": 2,
-    "points_needed": 6,
-    "num_targets": 2,
+    "points_needed": 10,
+    "num_targets": 4,
     "platforms": [
       { "x_frac": 0.1, "y_from_ground": 100, "w": 160, "h": 20 },
       { "x_frac": 0.4, "y_from_ground": 230, "w": 180, "h": 20 },
       { "x_frac": 0.7, "y_from_ground": 360, "w": 220, "h": 20 }
+    ]
+  }
+  ,
+  {
+    "id": 3,
+    "points_needed": 12,
+    "num_targets": 5,
+    "platforms": [
+      { "x_frac": 0.03, "y_from_ground": 120, "w": 140, "h": 20 },
+      { "x_frac": 0.28, "y_from_ground": 260, "w": 200, "h": 20 },
+      { "x_frac": 0.55, "y_from_ground": 180, "w": 160, "h": 20 },
+      { "x_frac": 0.82, "y_from_ground": 320, "w": 220, "h": 20 }
+    ]
+  },
+  {
+    "id": 4,
+    "points_needed": 24,
+    "num_targets": 6,
+    "platforms": [
+      { "x_frac": 0.12, "y_from_ground": 90,  "w": 180, "h": 20 },
+      { "x_frac": 0.37, "y_from_ground": 220, "w": 160, "h": 20 },
+      { "x_frac": 0.6,  "y_from_ground": 350, "w": 200, "h": 20 },
+      { "x_frac": 0.85, "y_from_ground": 140, "w": 140, "h": 20 }
     ]
   }
 ]

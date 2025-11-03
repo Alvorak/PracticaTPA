@@ -1,6 +1,7 @@
 import pygame
+import random
 from .. import config
-from .. constants import *
+from ..constants import *
 
 # Clase que representa el objetivo a golpear
 class Target:
@@ -27,6 +28,34 @@ class Target:
     # Reaparece el objetivo en una nueva posición aleatoria
     def respawn(self):
         """Sirve para reaparecer el objetivo en una nueva posición aleatoria."""
+        self.rect = self.random_position()
+
+    def respawn_away(self, player_rect, min_y_from_ground=150, min_x_distance=200):
+        """Reaparece el objetivo en una posición alejada del jugador y a una altura mínima.
+        player_rect: pygame.Rect del jugador para calcular distancia mínima en X.
+        min_y_from_ground: píxeles mínimos desde el suelo hacia arriba para colocar el objetivo.
+        min_x_distance: distancia mínima en X respecto al centro del jugador.
+        """
+        w, h = self.w, self.h
+        # calcular límites
+        ground_y = config.VIEWPORT_HEIGHT - config.GROUND_HEIGHT
+        max_y = max(0, ground_y - min_y_from_ground - h)
+        # si no cabe con min_y_from_ground, usar la funcionalidad normal
+        if max_y <= 0:
+            self.rect = self.random_position()
+            return
+
+        # intentar hasta N veces encontrar una posición suficientemente alejada
+        for _ in range(30):
+            x = random.randint(50, max(50, config.VIEWPORT_WIDTH - 50 - w))
+            # y en rango [0, max_y]
+            y = random.randint(0, max_y)
+            candidate = pygame.Rect(x, y, w, h)
+            if abs(candidate.centerx - player_rect.centerx) >= min_x_distance:
+                self.rect = candidate
+                return
+
+        # fallback: posición aleatoria clásica
         self.rect = self.random_position()
 
     # Dibuja el objetivo en pantalla

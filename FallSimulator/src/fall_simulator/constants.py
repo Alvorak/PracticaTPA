@@ -60,4 +60,16 @@ MENU_OPTIONS = [ # ("Texto que se muestra", "accion que retorna el menú")
 
 escape_pulsado_time = 0.0
 escape_limite = 4.0  # segundos necesarios para salir del juego
-""" Variables para controlar la salida del juego al mantener Escape pulsado."""
+
+""" Tiempo (s) durante el cual los enemigos están "congelados" tras cargar un nivel"""
+ENEMY_FROZEN_AFTER_LEVEL = 0.5
+
+""" Velocidad (px/s) de los proyectiles disparados por los enemigos"""
+ENEMY_PROJECTILE_SPEED = 500
+
+""" Rango de cooldown (segundos) aleatorio entre disparos de enemigos"""
+ENEMY_COOLDOWN_MIN = 1.0
+ENEMY_COOLDOWN_MAX = 2.5
+
+"""Límite por defecto de enemigos simultáneos en pantalla (se puede sobreescribir por nivel)"""
+MAX_ENEMIES_ON_SCREEN = 3
