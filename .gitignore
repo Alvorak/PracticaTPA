@@ -20,4 +20,4 @@ Thumbs.db
 .DS_Store
 
 # Savegame local
-src/fall_simulator/data/savegame.json
+FallSimulator/src/fall_simulator/data/savegame.json
