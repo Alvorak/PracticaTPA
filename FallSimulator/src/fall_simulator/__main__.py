@@ -28,7 +28,6 @@ def main(demo=False):
     estado = "menu"
     """El estado inicial del juego es el menú."""
     menu = Menu(screen)
-    game = Game(screen)
 
     # Modo demo: auto-juego simplificado
     if demo:
@@ -37,11 +36,28 @@ def main(demo=False):
         pygame.quit()
         return
     # Bucle normal
+    from . import savegame
     while estado != "salir":
         if estado == "menu":
             estado = menu.run()
-        elif estado == "juego":
-            estado = game.run()
+        elif estado == "nuevo":
+            # Nueva partida: limpiar guardado y arrancar desde cero
+            savegame.clear_save()
+            game = Game(screen)
+            result = game.run()
+            estado = "salir" if result == "salir" else "menu"
+        elif estado == "continuar":
+            # Continuar: intentar cargar guardado y crear Game con esos valores
+            s = savegame.load_game()
+            if s:
+                lvl = int(s.get('level_index', 0))
+                pts = int(s.get('puntos', 0))
+                lifes = int(s.get('lifes', 3))
+                game = Game(screen, lifes=lifes, puntos=pts, current_level_index=lvl)
+            else:
+                game = Game(screen)
+            result = game.run()
+            estado = "salir" if result == "salir" else "menu"
 
     pygame.quit()
 

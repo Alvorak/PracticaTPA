@@ -52,14 +52,14 @@ TEXT_COLOR = (230, 230, 230)
 
 
 MENU_OPTIONS = [ # ("Texto que se muestra", "accion que retorna el menú")
-    ("New Game!", "juego"),
-    ("Continue :D", "juego"),
+    ("New Game!", "nuevo"),
+    ("Continue :D", "continuar"),
     ("Close :(", "salir")
 ]
 """Opciones del menú principal."""
 
 escape_pulsado_time = 0.0
-escape_limite = 4.0  # segundos necesarios para salir del juego
+escape_limite = 1.0  # segundos necesarios para salir del juego
 
 """ Tiempo (s) durante el cual los enemigos están "congelados" tras cargar un nivel"""
 ENEMY_FROZEN_AFTER_LEVEL = 0.5

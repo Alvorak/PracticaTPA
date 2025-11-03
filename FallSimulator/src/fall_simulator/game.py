@@ -8,10 +8,11 @@ from .Entities.projectile import Projectile
 from .Entities.target import Target
 from .Entities.platform import Platform
 from .levels import load_levels
+from . import savegame
 
 class Game:
     """Clase principal del juego. Maneja el bucle del juego, actualizaciones y renderizado (gameloop)"""
-    def __init__(self, screen, lifes=3, puntos=0):
+    def __init__(self, screen, lifes=3, puntos=0, current_level_index=0):
         """Constructor de la clase Game."""
         self.screen = screen # Pantalla principal
         """Pantalla principal del juego."""
@@ -31,8 +32,8 @@ class Game:
         except Exception:
             # Si no se encuentra el archivo o hay error, usar un fallback mínimo
             self.levels = []
-        self.current_level_index = 0
-        self.escape_pulsado_time = 0.0
+        self.current_level_index = current_level_index # Índice del nivel actual
+        self.escape_pulsado_time = 0.0 
         """El tiempo en segundos que hay que mantener ESC pulsado para salir del juego."""
       
         if screen is not None:
@@ -227,6 +228,15 @@ class Game:
                 enemy_projectiles[hit_player].active = False
                 try:
                     self.lifes -= 1
+                    # autosave al perder vida
+                    try:
+                        savegame.save_game({
+                            'level_index': self.current_level_index,
+                            'puntos': self.puntos,
+                            'lifes': self.lifes
+                        })
+                    except Exception:
+                        pass
                 except Exception:
                     pass
                 # opcional: reubicar jugador ligeramente al centro inicial del viewport
@@ -266,6 +276,15 @@ class Game:
                 except Exception:
                     pass
                 self.puntos += 1
+                # autosave al ganar puntos
+                try:
+                    savegame.save_game({
+                        'level_index': self.current_level_index,
+                        'puntos': self.puntos,
+                        'lifes': self.lifes
+                    })
+                except Exception:
+                    pass
                 # si quedan enemigos por spawnear, añadir uno nuevo respetando el max_on_screen
                 if remaining_to_spawn > 0:
                     new_t = Target()
@@ -281,6 +300,15 @@ class Game:
                         # Mostrar pantalla de transición y cargar siguiente nivel
                         self._show_next_level_popup(self.screen, viewport, viewport_x, viewport_y, self.current_level_index + 1)
                         self.current_level_index += 1 # avanzar al siguiente nivel
+                        # guardar progreso: el jugador pasará al siguiente nivel (no completado aún)
+                        try:
+                            savegame.save_game({
+                                'level_index': self.current_level_index,
+                                'puntos': self.puntos,
+                                'lifes': self.lifes
+                            })
+                        except Exception:
+                            pass
                         # reset de estado que puede quedar activo al cambiar de nivel (asi evitamos apariciones raras)
                         projectiles = [] 
                         shoot_timer = 0.0
@@ -565,6 +593,15 @@ class Game:
                     enemy_projectiles[hit_player].active = False
                     try:
                         self.lifes -= 1
+                        # autosave en autoplay al perder vida
+                        try:
+                            savegame.save_game({
+                                'level_index': self.current_level_index,
+                                'puntos': self.puntos,
+                                'lifes': self.lifes
+                            })
+                        except Exception:
+                            pass
                     except Exception:
                         pass
                     try:
@@ -587,6 +624,15 @@ class Game:
                             t.respawn_away(player.rect, min_y_from_ground=150, min_x_distance=200)
                             break
                     self.puntos += 1
+                    # autosave en autoplay al ganar puntos
+                    try:
+                        savegame.save_game({
+                            'level_index': self.current_level_index,
+                            'puntos': self.puntos,
+                            'lifes': self.lifes
+                        })
+                    except Exception:
+                        pass
 
                 # Dibujo (sin gestión de eventos ni escape)
                 viewport.fill(config.BG_COLOR)
