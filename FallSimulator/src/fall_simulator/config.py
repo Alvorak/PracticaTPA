@@ -4,6 +4,7 @@
 import random
 import pygame
 from .constants import * # Importando todas las constantes desde constants.py
+
 def get_rect_in_viewport(w, h, margin_x=0, margin_y=0, ground=True):
 	"""
 	Devuelve un pygame.Rect dentro del área jugable (viewport), respetando márgenes opcionales
