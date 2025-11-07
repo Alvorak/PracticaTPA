@@ -45,47 +45,54 @@ FallSimulator/
 └─ .gitignore
 ```
 ## Instalación y Configuración
-1. Clonar el repositorio
+### 1. Clonar el repositorio
 ```
 git clone https://github.com/tu_usuario/PracticaTPA.git
 cd PracticaTPA/FallSimulator/src
 ```
 
-2. Crear y activar entorno virtual
-# Crear entorno virtual
+### 2. Crear y activar entorno virtual
+- Crear entorno virtual
 ```
 python -m venv .venv
 ```
 
-# Activar entorno virtual en Windows PowerShell
+### 3. Activar entorno virtual en Windows PowerShell
 ```
 .venv\Scripts\Activate.ps1
 ```
-(si da error de ejecución: Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass)
+**si da error de ejecución adjuntar en la terminal** 
+```
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+```
 es cuestion de permisos D: (sad, i know!)
 
-# En Linux / Mac
+ **En Linux / Mac**
 ```
 source .venv/bin/activate
 ```
-3. Instalar dependencias
+### 4. Instalar dependencias
 
 pip install -r requirements.txt
 
 ## Ejecución del Juego
-# Modo normal
+### Modo normal
 ```
 python -m fall_simulator
 ```
+### Modo demo 
+"se explica mas adelante"
+```
+python -m fall_simulator --demo
+```
 
-# Controles:
-
+## Controles:
 - A/D – Moverse
 - Space/W – Saltar
 - S – Agacharse
 - Flechas – Disparar (puede combinarse diagonalmente)
 
-# Modo demo / auto_play (PROTOTIPO AUN)
+## Modo demo / auto_play (PROTOTIPO AUN)
 ```
 from fall_simulator.game import Game
 import pygame
@@ -99,14 +106,14 @@ game.auto_play()  # Juega automáticamente un nivel corto
 El modo demo simula movimientos aleatorios de izquierda a derecha, saltos, agacharse y disparos para revisión rápida.
 
 
-# Testing con Pytest
+## Testing con Pytest
 
-# Activar entorno virtual si no lo está
+### 1.Activar entorno virtual si no lo está
 ```
 .venv\Scripts\Activate.ps1
 ```
 
-# Ejecutar tests
+### 2.Ejecutar tests
 ```
 pytest
 ```
