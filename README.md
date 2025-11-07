@@ -1,4 +1,4 @@
-<img width="867" height="425" alt="{181AD750-2DAA-4AFB-81F9-8D0C1334D164}" src="https://github.com/user-attachments/assets/98740e9d-2851-44ce-93db-40cd2fc0c173" /># PracticaTPA – FallSimulator
+PracticaTPA – FallSimulator
 
 Repositorio para el proyecto de la asignatura de Técnicas de Programación Avanzada (TPA).
 
