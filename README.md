@@ -1,4 +1,4 @@
-# PracticaTPA – FallSimulator
+<img width="867" height="425" alt="{181AD750-2DAA-4AFB-81F9-8D0C1334D164}" src="https://github.com/user-attachments/assets/98740e9d-2851-44ce-93db-40cd2fc0c173" /># PracticaTPA – FallSimulator
 
 Repositorio para el proyecto de la asignatura de Técnicas de Programación Avanzada (TPA).
 
@@ -32,7 +32,9 @@ El objetivo principal es **progresar lo máximo posible**, combinando precisión
 ```text
 FallSimulator/
 │
+├─ pyproyect.toml
 ├─ src/
+│  └─ requirements.txt
 │  └─ fall_simulator/
 │     ├─ __init__.py
 │     ├─ __main__.py
@@ -40,6 +42,8 @@ FallSimulator/
 │     ├─ menu.py
 │     ├─ config.py
 │     ├─ constants.py
+│     ├─ levels.py
+│     ├─ savegame.py
 │     ├─ Entities/
 │     │  ├─ player.py
 │     │  ├─ projectile.py
@@ -47,7 +51,13 @@ FallSimulator/
 │     │  └─ platform.py
 │     └─ tests/
 │        └─ test_game.py
-├─ requirements.txt
+│     └─ data/
+│        └─ DiagramaUML.md
+│        └─ levels.json
+├─ gendocs.bat
+├─ gendocs.sh
+├─ .pre-commit-config.yaml
+├─ README.md
 └─ .gitignore
 ```
 ## Instalación y Configuración
