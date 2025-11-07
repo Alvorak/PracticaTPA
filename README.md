@@ -68,7 +68,7 @@ python -m venv .venv
 .venv\Scripts\Activate.ps1
 ```
 **si da error de ejecución adjuntar en la terminal** 
-```cmd
+```powershell
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 ```
 es cuestion de permisos D: (sad, i know!)
