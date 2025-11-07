@@ -16,8 +16,14 @@ El objetivo principal es **progresar lo máximo posible**, combinando precisión
 
 - **Python 3.11** – Lenguaje de programación principal.  
 - **Pygame 2.x** – Biblioteca para gráficos, sonidos y eventos.  
-- **pytest** – Para pruebas unitarias.  
-- **GitHub Copilot** – Asistente de programación (opcional).  
+- **pytest** – Framework para pruebas unitarias.  
+- **python-dotenv** – Manejo de variables de entorno desde archivos .env.
+
+## Herramientas de desarrollo
+- **black** – Formateador automático de código.
+- **ruff** – Analizador estático y linter para mantener la calidad del código.
+- **pdoc** – Generador de documentación automática a partir de docstrings.
+- **GitHub Copilot** (opcional) – Asistente de programación basado en IA.
 
 ---
 
