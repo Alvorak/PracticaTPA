@@ -36,6 +36,8 @@ def main(demo=False):
     # Modo demo: auto-juego simplificado
     if demo:
         estado = "juego"
+        # Crear y ejecutar el juego en modo auto-play
+        game = Game(screen)
         game.auto_play()
         pygame.quit()
         return
