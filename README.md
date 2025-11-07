@@ -98,7 +98,7 @@ python -m fall_simulator --demo
 - S – Agacharse
 - Flechas – Disparar (puede combinarse diagonalmente)
 
-## Modo demo / auto_play (PROTOTIPO AUN)
+## Modo demo / auto_play
 ```python
 from fall_simulator.game import Game
 import pygame
